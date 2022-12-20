@@ -1,0 +1,25 @@
+{
+  "name": "screeps-bot-hurricane",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "author": "uwap",
+  "license": "MIT",
+  "scripts": {
+    "build": "npx spack",
+    "lint": "npx eslint src/",
+    "prepare": "husky install",
+    "test": "yarn lint"
+  },
+  "dependencies": {
+    "@types/screeps": "^3.3.0"
+  },
+  "devDependencies": {
+    "@swc/cli": "^0.1.57",
+    "@swc/core": "^1.3.23",
+    "@typescript-eslint/eslint-plugin": "^5.47.0",
+    "@typescript-eslint/parser": "^5.47.0",
+    "eslint": "^8.30.0",
+    "husky": "^8.0.0",
+    "typescript": "^4.9.4"
+  }
+}
