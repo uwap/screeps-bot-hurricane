@@ -9,7 +9,7 @@
     "lint": "npx eslint src/",
     "prepare": "husky install",
     "test": "yarn lint",
-    "push": "node ./upload.js"
+    "push": "yarn build && node ./upload.js"
   },
   "dependencies": {
     "@types/screeps": "^3.3.0"
