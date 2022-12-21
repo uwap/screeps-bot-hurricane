@@ -1,5 +1,5 @@
 export const buildRoads = (room: Room) => {
-    if (room.controller?.level ?? 0 < 2) {
+    if ((room.controller?.level ?? 0) < 2) {
         return;
     }
     const sources = room.find(FIND_SOURCES);
