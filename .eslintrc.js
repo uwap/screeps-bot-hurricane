@@ -5,5 +5,8 @@ module.exports = {
     root: true,
     parserOptions: {
         "project": ["tsconfig.json"]
+    },
+    rules: {
+        'no-unused-vars': "off"
     }
 };
