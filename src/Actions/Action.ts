@@ -51,7 +51,7 @@ export const createAction = (name: string, action: (creep: Creep) => Action): Ac
         if ((creep.memory.state ?? 0) > state) {
             return Success(creep, state);
         }
-        console.log(`[${creep.name}] Running action ${name}`)
+        //console.log(`[${creep.name}] Running action ${name}`)
         return action(creep)(creep, state);
     }
 }
