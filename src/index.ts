@@ -2,6 +2,7 @@ import { runAction } from "./Actions/Action";
 import { harvestFromClosestActiveSource } from "./Actions/harvest";
 import { transferEnergy } from "./Actions/transferEnergy";
 import { upgradeController } from "./Actions/upgradeController";
+import { buildRoads } from "./RoomPlanner/Blueprints/Roads";
 
 export function loop() {
     const spawn = Game.spawns.Spawn1;
@@ -20,6 +21,11 @@ export function loop() {
             .andThen(transferEnergy(spawn))
             .or(upgradeController(controller))
             .repeat()
-
+    }
+    if (Game.time % 100 === 0) {
+        buildRoads(spawn.room);
+    }
+    if (Game.cpu.bucket === 10000) {
+        Game.cpu.generatePixel();
     }
 }
