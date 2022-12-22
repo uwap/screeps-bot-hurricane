@@ -3,8 +3,12 @@ import { buildConstructionSite } from "./Actions/buildConstructionSite";
 import { harvestFromClosestActiveSource } from "./Actions/harvest";
 import { transferEnergy } from "./Actions/transferEnergy";
 import { upgradeController } from "./Actions/upgradeController";
+import { buildContainers } from "./RoomPlanner/Blueprints/Containers";
 import { buildExtentions } from "./RoomPlanner/Blueprints/Extensions";
 import { buildRoads } from "./RoomPlanner/Blueprints/Roads";
+import { Constructor } from "./Workers/Constructor";
+import { Upgrader } from "./Workers/Upgrader";
+import { runWorkers, spawnWorkers } from "./Workers/worker";
 
 export function loop() {
     const spawn = Game.spawns.Spawn1;
@@ -12,33 +16,16 @@ export function loop() {
     if (!controller) {
         return;
     }
-    spawn.spawnCreep([WORK, CARRY, CARRY, MOVE], 'builder9');
-    spawn.spawnCreep([WORK, CARRY, CARRY, MOVE], 'upgrader8');
-    spawn.spawnCreep([WORK, CARRY, CARRY, MOVE], 'builder7');
-    spawn.spawnCreep([WORK, CARRY, CARRY, MOVE], 'builder6');
-    spawn.spawnCreep([WORK, CARRY, CARRY, MOVE], 'uprader5');
-    spawn.spawnCreep([WORK, CARRY, CARRY, MOVE], 'builder4');
-    spawn.spawnCreep([WORK, CARRY, CARRY, MOVE], 'builder3');
-    spawn.spawnCreep([WORK, CARRY, CARRY, MOVE], 'upgrader2');
-    spawn.spawnCreep([WORK, CARRY, CARRY, MOVE], 'upgrader1');
-    for (const creep of Object.values(Game.creeps)) {
-        if (creep.name.startsWith('u') || creep.name.startsWith('w')) {
-            runAction(creep, harvestFromClosestActiveSource())
-            .andThen(transferEnergy(spawn))
-            .or(upgradeController(controller))
-            .repeat()
-        } else if (creep.name.startsWith('b')) {
-            runAction(creep, harvestFromClosestActiveSource())
-            .andThen(buildConstructionSite())
-            .or(upgradeController(controller))
-            .repeat()
-        }
-    }
+    spawnWorkers(spawn, [Constructor, Upgrader]);
+    runWorkers(spawn, [Constructor, Upgrader]);
     if (Game.time % 100 === 0) {
         buildRoads(spawn.room);
     }
     if (Game.time % 100 === 50) {
         buildExtentions(spawn.room);
+    }
+    if (Game.time % 100 === 25) {
+        buildContainers(spawn.room);
     }
     if (Game.cpu.bucket === 10000) {
         Game.cpu.generatePixel();
