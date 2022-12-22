@@ -12,6 +12,9 @@ export function loop() {
     if (!controller) {
         return;
     }
+    spawn.spawnCreep([WORK, CARRY, CARRY, MOVE], 'builder9');
+    spawn.spawnCreep([WORK, CARRY, CARRY, MOVE], 'upgrader8');
+    spawn.spawnCreep([WORK, CARRY, CARRY, MOVE], 'builder7');
     spawn.spawnCreep([WORK, CARRY, CARRY, MOVE], 'builder6');
     spawn.spawnCreep([WORK, CARRY, CARRY, MOVE], 'uprader5');
     spawn.spawnCreep([WORK, CARRY, CARRY, MOVE], 'builder4');
@@ -35,7 +38,7 @@ export function loop() {
         buildRoads(spawn.room);
     }
     if (Game.time % 100 === 50) {
-        buildExtentions(spawn.room)
+        buildExtentions(spawn.room);
     }
     if (Game.cpu.bucket === 10000) {
         Game.cpu.generatePixel();

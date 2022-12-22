@@ -12,6 +12,9 @@ export const buildRoads = (room: Room) => {
                 ignoreRoads: true
             });
             for (const point of path) {
+                if ((point.x === source.pos.x && point.y === source.pos.y) || (point.x === source2.pos.x && point.y === source2.pos.y)) {
+                    continue;
+                }
                 room.visual.line(point.x, point.y, point.x - point.dx, point.y - point.dy);
                 room.createConstructionSite(point.x, point.y, STRUCTURE_ROAD);
             }
