@@ -5,7 +5,7 @@ import { WorkerDefinition } from "./worker";
 
 export const Miner: WorkerDefinition = {
     runAction: (creep: Creep) => runAction(creep, harvestFromClosestActiveSource())
-        .andThen(transferEnergy(<StructureContainer | null> creep.pos.findClosestByRange(FIND_STRUCTURES, { filter: { structureType: STRUCTURE_CONTAINER }})))
+        .andThen(transferEnergy(creep.pos.findClosestByRange(FIND_STRUCTURES, { filter: { structureType: STRUCTURE_CONTAINER }}) as StructureContainer | null))
         .repeat(),
     name: 'miner',
     requiredCreeps: (room: Room) => room.find(FIND_STRUCTURES, { filter: { structureType: STRUCTURE_CONTAINER }}).length > 0 ? 4 : 0,

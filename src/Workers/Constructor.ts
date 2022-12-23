@@ -6,7 +6,7 @@ import { withdrawEnergy } from "../Actions/withdrawEnergy";
 import { WorkerDefinition } from "./worker";
 
 export const Constructor: WorkerDefinition = {
-    runAction: (creep: Creep) => runAction(creep, withdrawEnergy(<StructureContainer | null> creep.pos.findClosestByRange(FIND_STRUCTURES, { filter: { structureType: STRUCTURE_CONTAINER }})))
+    runAction: (creep: Creep) => runAction(creep, withdrawEnergy(creep.pos.findClosestByRange(FIND_STRUCTURES, { filter: { structureType: STRUCTURE_CONTAINER }}) as StructureContainer | null))
         .or(harvestFromClosestActiveSource())
         .andThen(buildConstructionSite())
         .or(creep.room.controller ? upgradeController(creep.room.controller) : Fail)
