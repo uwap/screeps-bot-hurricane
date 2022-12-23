@@ -7,6 +7,7 @@ import { buildContainers } from "./RoomPlanner/Blueprints/Containers";
 import { buildExtentions } from "./RoomPlanner/Blueprints/Extensions";
 import { buildRoads } from "./RoomPlanner/Blueprints/Roads";
 import { Constructor } from "./Workers/Constructor";
+import { Miner } from "./Workers/Miner";
 import { Upgrader } from "./Workers/Upgrader";
 import { runWorkers, spawnWorkers } from "./Workers/worker";
 
@@ -16,8 +17,9 @@ export function loop() {
     if (!controller) {
         return;
     }
-    spawnWorkers(spawn, [Constructor, Upgrader]);
-    runWorkers(spawn, [Constructor, Upgrader]);
+    const workerTypes = [Constructor, Upgrader, Miner];
+    spawnWorkers(spawn, workerTypes);
+    runWorkers(spawn, workerTypes);
     if (Game.time % 100 === 0) {
         buildRoads(spawn.room);
     }

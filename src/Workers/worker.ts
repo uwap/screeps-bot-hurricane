@@ -8,7 +8,7 @@ export interface WorkerDefinition {
 export const spawnWorkers = (spawn: StructureSpawn, workers: WorkerDefinition[]): void => {
     for (const worker of workers) {
         for (let i = 0; i < worker.requiredCreeps(spawn.room); i++) {
-            spawn.spawnCreep(worker.bodyDefinition(spawn.store.getCapacity(RESOURCE_ENERGY), spawn), worker.name + i.toString());
+            const ret = spawn.spawnCreep(worker.bodyDefinition(spawn.store.getCapacity(RESOURCE_ENERGY) + spawn.room.find(FIND_MY_STRUCTURES, { filter: { structureType: STRUCTURE_EXTENSION }}).length * 50, spawn), worker.name + i.toString());
         }
     }
 };

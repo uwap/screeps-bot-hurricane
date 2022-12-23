@@ -12,6 +12,8 @@ export const buildExtentions = (room: Room) => {
             room.visual.circle(spawn.pos.x + x * 2, spawn.pos.y + y * 2);
             if (!room.lookAt(spawn.pos.x + x * 2 - 1, spawn.pos.y + y * 2 - 1).includes({ type: 'terrain', terrain: 'wall'})) {
                 room.createConstructionSite(spawn.pos.x + x * 2 - 1, spawn.pos.y + y * 2 - 1, STRUCTURE_ROAD);
+                room.createConstructionSite(spawn.pos.x + x * 2, spawn.pos.y + y * 2 - 1, STRUCTURE_ROAD);
+                room.createConstructionSite(spawn.pos.x + x * 2 - 1, spawn.pos.y + y * 2, STRUCTURE_ROAD);
             }
             room.createConstructionSite(spawn.pos.x + x * 2, spawn.pos.y + y * 2, STRUCTURE_EXTENSION);
         }
