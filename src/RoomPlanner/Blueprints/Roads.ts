@@ -4,9 +4,10 @@ export const buildRoads = (room: Room) => {
     }
     const sources: _HasRoomPosition[] = room.find(FIND_SOURCES);
     const sourcesAndSpawns = sources.concat(room.find(FIND_MY_SPAWNS));
+    const sourcesAndMinerals = sources.concat(room.find(FIND_MINERALS));
     room.visual.clear();
     for (const source of sourcesAndSpawns) {
-        for (const source2 of sources) {
+        for (const source2 of (room.controller?.level ?? 0) > 4 ? sourcesAndMinerals : sources) {
             const path = source.pos.findPathTo(source2, {
                 ignoreCreeps: true,
                 ignoreRoads: true

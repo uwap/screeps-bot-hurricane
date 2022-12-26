@@ -17,7 +17,7 @@ export function loop() {
     if (!controller) {
         return;
     }
-    const workerTypes = [Constructor, Upgrader, Miner];
+    const workerTypes = [Upgrader, Miner, Constructor];
     spawnWorkers(spawn, workerTypes);
     runWorkers(spawn, workerTypes);
     if (Game.time % 100 === 0) {
