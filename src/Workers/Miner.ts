@@ -9,5 +9,8 @@ export const Miner: WorkerDefinition = {
         .repeat(),
     name: 'miner',
     requiredCreeps: (room: Room) => room.find(FIND_STRUCTURES, { filter: { structureType: STRUCTURE_CONTAINER }}).length > 0 ? 4 : 0,
-    bodyDefinition: (energy: number) => [WORK, WORK, MOVE, CARRY].concat(new Array(Math.floor((energy - 300) / 100)).fill(WORK))
+    bodyDefinition: (energy: number) => [WORK, WORK, MOVE, CARRY].concat(new Array(Math.floor((energy - 300) / 100)).fill(WORK)),
+    motivationalThougts: [
+        "RocknStone"
+    ]
 }

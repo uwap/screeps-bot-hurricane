@@ -6,13 +6,15 @@ import { withdrawEnergy } from "../Actions/withdrawEnergy";
 import { WorkerDefinition } from "./worker";
 
 export const Upgrader: WorkerDefinition = {
-    runAction: (creep: Creep, spawn: StructureSpawn) => runAction(creep, withdrawEnergy(creep.pos.findClosestByRange(FIND_STRUCTURES, { filter: (str: Structure) => str.structureType === STRUCTURE_CONTAINER && (str as StructureContainer).store.getUsedCapacity(RESOURCE_ENERGY) > 0 }) as StructureContainer | null))
+    runAction: (creep: Creep, spawn: StructureSpawn) => runAction(creep, withdrawEnergy(creep.pos.findClosestByRange(FIND_STRUCTURES, { filter: (str: Structure) => str.structureType === STRUCTURE_STORAGE && (str as StructureStorage).store.getUsedCapacity(RESOURCE_ENERGY) > 0 }) as StructureStorage | null))
+        .or(withdrawEnergy(creep.pos.findClosestByRange(FIND_STRUCTURES, { filter: (str: Structure) => str.structureType === STRUCTURE_CONTAINER && (str as StructureContainer).store.getUsedCapacity(RESOURCE_ENERGY) > 0 }) as StructureContainer | null))
         .or(harvestFromClosestActiveSource())
-        .andThen(transferEnergy(spawn))
-        .or(transferEnergy(creep.pos.findClosestByRange(FIND_MY_STRUCTURES, { filter: (structure: AnyOwnedStructure) => structure.structureType === STRUCTURE_EXTENSION && structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0}) as StructureExtension | null))
-        .or(creep.room.controller ? upgradeController(creep.room.controller) : Fail)
+        .andThen(creep.room.controller ? upgradeController(creep.room.controller) : Fail)
         .repeat(),
     name: 'upgrader',
-    requiredCreeps: (room: Room) => 4,
-    bodyDefinition: (energy: number) => new Array(Math.floor(energy / 300)).fill([WORK, WORK, MOVE, CARRY]).reduce((x, y) => x.concat(y), [])
+    requiredCreeps: (room: Room) => 1,
+    bodyDefinition: (energy: number) => new Array(Math.floor(energy / 300)).fill([WORK, WORK, MOVE, CARRY]).reduce((x, y) => x.concat(y), []),
+    motivationalThougts: [
+        '🏳️‍⚧️'
+    ]
 }

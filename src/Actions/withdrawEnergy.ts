@@ -1,7 +1,7 @@
 import { createAction, Fail, InProgress, Success } from "./Action";
 import { moveTo } from "./moveTo";
 
-export const withdrawEnergy = (target: StructureContainer | null) => createAction('transferEnergy', (creep: Creep) => {
+export const withdrawEnergy = (target: StructureContainer | StructureStorage | null) => createAction('transferEnergy', (creep: Creep) => {
     if (target == null) {
         return Fail;
     }

@@ -6,6 +6,7 @@ import { upgradeController } from "./Actions/upgradeController";
 import { buildContainers } from "./RoomPlanner/Blueprints/Containers";
 import { buildExtentions } from "./RoomPlanner/Blueprints/Extensions";
 import { buildRoads } from "./RoomPlanner/Blueprints/Roads";
+import { Clerk } from "./Workers/Clerk";
 import { Constructor } from "./Workers/Constructor";
 import { Miner } from "./Workers/Miner";
 import { Upgrader } from "./Workers/Upgrader";
@@ -17,7 +18,7 @@ export function loop() {
     if (!controller) {
         return;
     }
-    const workerTypes = [Upgrader, Miner, Constructor];
+    const workerTypes = [Clerk, Upgrader, Miner, Constructor];
     spawnWorkers(spawn, workerTypes);
     runWorkers(spawn, workerTypes);
     if (Game.time % 100 === 0) {
