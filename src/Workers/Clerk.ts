@@ -15,7 +15,7 @@ export const Clerk: WorkerDefinition = {
         .repeat(),
     name: 'clerk',
     requiredCreeps: (room: Room) => 2,
-    bodyDefinition: (energy: number) => [WORK].concat(new Array(Math.floor(energy / 150)).fill([MOVE, CARRY, CARRY]).reduce((x, y) => x.concat(y), [])),
+    bodyDefinition: (energy: number) => energy < 100 ? [] : [WORK].concat(new Array(Math.floor((energy - 100) / 150)).fill([MOVE, CARRY, CARRY]).reduce((x, y) => x.concat(y), [])),
     motivationalThougts: [
         "Carrying 🎒",
         "💗 working"
