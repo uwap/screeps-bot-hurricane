@@ -6,6 +6,7 @@ import { Constructor } from "./Workers/Constructor";
 import { Miner } from "./Workers/Miner";
 import { Upgrader } from "./Workers/Upgrader";
 import { runWorkers, spawnWorkers } from "./Workers/worker";
+import "../deps/Traveler/Traveler";
 
 const runTowers = (spawn: StructureSpawn) => {
   const towers: StructureTower[] = spawn.room.find(FIND_MY_STRUCTURES,

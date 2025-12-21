@@ -1,0 +1,3 @@
+[submodule "deps/Traveler"]
+	path = deps/Traveler
+	url = https://github.com/screepers/Traveler.git
