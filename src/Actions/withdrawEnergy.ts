@@ -1,25 +1,27 @@
 import { createAction, Fail, InProgress, Success } from "./Action";
 import { moveTo } from "./moveTo";
 
-export const withdrawEnergy = (target: StructureContainer | StructureStorage | null) => createAction('transferEnergy', (creep: Creep) => {
-    if (target == null) {
+export const withdrawEnergy
+  = (target: StructureContainer | StructureStorage | null) =>
+    createAction("withdrawEnergy", (creep: Creep) => {
+      if (target == null) {
         return Fail;
-    }
-    if (target.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
+      }
+      if (target.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
         return Fail;
-    }
-    switch(creep.withdraw(target, RESOURCE_ENERGY)) {
+      }
+      switch (creep.withdraw(target, RESOURCE_ENERGY)) {
         case OK: {
-            return InProgress;
+          return InProgress;
         }
         case ERR_FULL: {
-            return Success;
+          return Success;
         }
         case ERR_NOT_IN_RANGE: {
-            return moveTo(target);
+          return moveTo(target);
         }
         default: {
-            return Fail;
+          return Fail;
         }
-    }
-});
+      }
+    });

@@ -4,7 +4,7 @@ const fs = require('fs');
 var https = require('https');
 
 var data = {
-    branch: 'world',         
+    branch: 'hurricane',
     modules: {
         main: fs.readFileSync('./dist/screeps.js', 'utf-8').toString(),
     }

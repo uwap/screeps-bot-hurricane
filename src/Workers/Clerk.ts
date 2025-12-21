@@ -1,23 +1,41 @@
-import { Fail, runAction } from "../Actions/Action";
+import { runAction } from "../Actions/Action";
 import { harvestFromClosestActiveSource } from "../Actions/harvest";
 import { transferEnergy } from "../Actions/transferEnergy";
 import { upgradeController } from "../Actions/upgradeController";
+import {
+  closestContainerWithEnergy,
+  closestExtensionToFill,
+  closestStorageToFill,
+  closestTowerToFill,
+  notNull,
+} from "../Actions/Util";
 import { withdrawEnergy } from "../Actions/withdrawEnergy";
 import { WorkerDefinition } from "./worker";
 
+const action = (creep: Creep, spawn: StructureSpawn) => runAction(creep,
+  withdrawEnergy(closestContainerWithEnergy(creep.pos)))
+  .or(harvestFromClosestActiveSource())
+  .andThen(transferEnergy(closestExtensionToFill(creep.pos)))
+  .or(transferEnergy(spawn))
+  .or(transferEnergy(closestTowerToFill(creep.pos)))
+  .or(transferEnergy(closestStorageToFill(creep.pos, RESOURCE_ENERGY)))
+  .or(notNull(creep.room.controller, upgradeController))
+  .repeat();
+
+const body = (energy: number) => (
+  energy < 100
+    ? []
+    : [WORK].concat(new Array(Math.floor((energy - 100) / 150))
+        .fill([MOVE, CARRY, CARRY]).reduce((x, y) => x.concat(y), []))
+);
+
 export const Clerk: WorkerDefinition = {
-    runAction: (creep: Creep, spawn: StructureSpawn) => runAction(creep, withdrawEnergy(creep.pos.findClosestByRange(FIND_STRUCTURES, { filter: (str: Structure) => str.structureType === STRUCTURE_CONTAINER && (str as StructureContainer).store.getUsedCapacity(RESOURCE_ENERGY) > 0 }) as StructureContainer | null))
-        .or(harvestFromClosestActiveSource())
-        .andThen(transferEnergy(spawn))
-        .or(transferEnergy(creep.pos.findClosestByRange(FIND_MY_STRUCTURES, { filter: (structure: AnyOwnedStructure) => structure.structureType === STRUCTURE_EXTENSION && structure.store.getFreeCapacity(RESOURCE_ENERGY) > 0}) as StructureExtension | null))
-        .or(transferEnergy(creep.pos.findClosestByRange(FIND_STRUCTURES, { filter: (str: Structure) => str.structureType === STRUCTURE_STORAGE && (str as StructureStorage).store.getFreeCapacity(RESOURCE_ENERGY) > 0 }) as StructureStorage | null))
-        .or(creep.room.controller ? upgradeController(creep.room.controller) : Fail)
-        .repeat(),
-    name: 'clerk',
-    requiredCreeps: (room: Room) => 2,
-    bodyDefinition: (energy: number) => energy < 100 ? [] : [WORK].concat(new Array(Math.floor((energy - 100) / 150)).fill([MOVE, CARRY, CARRY]).reduce((x, y) => x.concat(y), [])),
-    motivationalThougts: [
-        "Carrying 🎒",
-        "💗 working"
-    ]
-}
+  runAction: action,
+  name: "clerk",
+  requiredCreeps: () => 3,
+  bodyDefinition: body,
+  motivationalThougts: [
+    "Carrying 🎒",
+    "💗 working",
+  ],
+};
