@@ -1,3 +1,6 @@
 [submodule "deps/Traveler"]
 	path = deps/Traveler
-	url = https://github.com/screepers/Traveler.git
+	url = https://github.com/UndefinedCpp/Traveler.git
+[submodule "deps/screeps-packrat"]
+	path = deps/screeps-packrat
+	url = https://github.com/NekoKetsu/screeps-packrat.git
