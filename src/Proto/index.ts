@@ -1,9 +1,8 @@
 declare global {
   interface RoomMemory {
-    sources: {
-      [id: Id<Source>]: SourceMemory;
-    };
+    sources: Record<Id<Source>, SourceMemory>;
     spawn: Id<StructureSpawn> | null;
+    mineral: Id<Mineral> | null;
     _spawnCacheTimeout?: number;
   }
 
@@ -19,6 +18,7 @@ declare global {
   interface Room {
     get sources(): Source[];
     get spawn(): StructureSpawn | null;
+    get mineral(): Mineral | null;
   }
 }
 
@@ -63,6 +63,23 @@ Object.defineProperty(Room.prototype, "spawn", {
   configurable: true,
 });
 
+Object.defineProperty(Room.prototype, "mineral", {
+  get: function (this: Room) {
+    if (this == Room.prototype || this == undefined) return undefined;
+    if (!this.memory.mineral) {
+      const minerals = this.find(FIND_MINERALS);
+      if (minerals.length > 0) {
+        this.memory.mineral = minerals[0].id;
+      }
+    }
+    return this.memory.mineral == null
+      ? null
+      : Game.getObjectById(this.memory.mineral);
+  },
+  enumerable: false,
+  configurable: true,
+});
+
 Object.defineProperty(Source.prototype, "memory", {
   get: function (this: Source) {
     return this.room.memory.sources[this.id];
@@ -80,7 +97,7 @@ Object.defineProperty(Source.prototype, "container", {
       || Game.getObjectById(this.memory.container) == null) {
       const containers = this.pos.findInRange(FIND_STRUCTURES, 1, {
         filter: (s: Structure) => s.structureType === STRUCTURE_CONTAINER,
-      }) as StructureContainer[];
+      });
       if (containers.length > 0) {
         this.memory.container = containers[0].id;
       }

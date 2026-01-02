@@ -14,7 +14,7 @@ const defaultOptions: HarvestOptions = {
 };
 
 export const Harvest
-  = (target: Source | Mineral<MineralConstant>,
+  = (target: Source | Mineral,
     opts: Partial<HarvestOptions> = {}): TaskData => ({
     target,
     targetPos: target.pos,
@@ -33,7 +33,7 @@ export const runHarvest = profiler.registerFN((creep: Creep): TaskStatus => {
     return TaskStatus.DONE;
   }
 
-  const target = task.target as Source | Mineral<MineralConstant> | null;
+  const target = task.target as Source | Mineral | null;
   const opts = task.options as HarvestOptions;
   const data = task.data as HarvestData;
 

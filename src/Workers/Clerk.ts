@@ -1,26 +1,53 @@
-import { runAction } from "../Actions/Action";
-import { harvestFromClosestActiveSource } from "../Actions/harvest";
-import { transferEnergy } from "../Actions/transferEnergy";
-import { upgradeController } from "../Actions/upgradeController";
 import {
   closestContainerWithEnergy,
   closestExtensionToFill,
-  closestStorageToFill,
   closestTowerToFill,
-  notNull,
-} from "../Actions/Util";
-import { withdrawEnergy } from "../Actions/withdrawEnergy";
+} from "./Util";
+import Tasks from "../Tasks";
 import { WorkerDefinition } from "./worker";
 
-const action = (creep: Creep, spawn: StructureSpawn) => runAction(creep,
-  withdrawEnergy(closestContainerWithEnergy(creep.pos)))
-  .or(harvestFromClosestActiveSource())
-  .andThen(transferEnergy(closestExtensionToFill(creep.pos)))
-  .or(transferEnergy(spawn))
-  .or(transferEnergy(closestTowerToFill(creep.pos)))
-  .or(transferEnergy(closestStorageToFill(creep.pos, RESOURCE_ENERGY)))
-  .or(notNull(creep.room.controller, upgradeController))
-  .repeat();
+const assignTask = (creep: Creep) => {
+  if (creep.store.energy > 0) {
+    const ext = closestExtensionToFill(creep.pos);
+    if (ext != null) {
+      return Tasks.Transfer(ext);
+    }
+    if (creep.room.spawn?.store.getFreeCapacity(RESOURCE_ENERGY) ?? 0 > 0) {
+      return Tasks.Transfer(creep.room.spawn!);
+    }
+    const tower = closestTowerToFill(creep.pos);
+    if (tower != null) {
+      return Tasks.Transfer(tower);
+    }
+    if (creep.room.controller != null) {
+      if (creep.room.controller.ticksToDowngrade > 1000) {
+        const urgentRepair = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+          filter: s => s.hits < s.hitsMax * 0.3,
+        });
+        if (urgentRepair != null) {
+          return Tasks.Repair(urgentRepair);
+        }
+      }
+      return Tasks.Upgrade(creep.room.controller);
+    }
+  }
+  else {
+    const resource = creep.pos.findClosestByRange(FIND_DROPPED_RESOURCES,
+      { filter: r => r.resourceType === RESOURCE_ENERGY });
+    if (resource != null) {
+      return Tasks.Pickup(resource);
+    }
+    const container = closestContainerWithEnergy(creep.pos);
+    if (container != null) {
+      return Tasks.Withdraw(container);
+    }
+    const source = creep.pos.findClosestByPath(FIND_SOURCES_ACTIVE);
+    if (source != null) {
+      return Tasks.Harvest(source);
+    }
+  }
+  return null;
+};
 
 const body = (energy: number) => (
   energy < 100
@@ -30,7 +57,7 @@ const body = (energy: number) => (
 );
 
 export const Clerk: WorkerDefinition = {
-  runAction: action,
+  assignTask,
   name: "clerk",
   requiredCreeps: () => 3,
   bodyDefinition: body,

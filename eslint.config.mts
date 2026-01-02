@@ -11,14 +11,33 @@ export default defineConfig([
       "@stylistic": stylistic
     },
     extends: ["js/recommended"],
-    languageOptions: { globals: globals.browser },
+    languageOptions: {
+      globals: globals.browser,
+      parserOptions: {
+        projectService: true,
+      },
+    },
     rules: {
       "@stylistic/max-len": ["error", { code: 80, tabWidth: 2 }],
-    }
+    },
   },
   tseslint.configs.recommended,
+  tseslint.configs.stylisticTypeChecked,
   stylistic.configs.customize({
     quotes: "double",
     semi: true,
-  })
+  }),
+  {
+    rules: {
+      "@typescript-eslint/no-unused-vars": ["error", {
+        "args": "all",
+        "argsIgnorePattern": "^_",
+        "caughtErrors": "all",
+        "caughtErrorsIgnorePattern": "^_",
+        "destructuredArrayIgnorePattern": "^_",
+        "varsIgnorePattern": "^_",
+        "ignoreRestSiblings": true
+      }],
+    }
+  }
 ]);

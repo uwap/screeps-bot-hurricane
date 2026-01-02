@@ -9,7 +9,7 @@ export enum TaskType {
   Transfer,
   Build,
   Repair,
-  Pickup
+  Pickup,
 }
 
 export enum TaskStatus {

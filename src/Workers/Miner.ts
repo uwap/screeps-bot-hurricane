@@ -1,29 +1,32 @@
-import { runAction } from "../Actions/Action";
-import { harvestFromClosestActiveSource } from "../Actions/harvest";
-import { transferEnergy } from "../Actions/transferEnergy";
-import { closestContainerToFill } from "../Actions/Util";
+import Tasks from "../Tasks";
 import { WorkerDefinition } from "./worker";
 
-const action = (creep: Creep) => runAction(creep,
-  harvestFromClosestActiveSource())
-  .andThen(transferEnergy(closestContainerToFill(creep.pos)))
-  .repeat();
+const assignTask = (creep: Creep) => {
+  const source = creep.room.sources.find(
+    s => s.container != null
+      && s.assignedCreeps.find(c => c.name.startsWith("miner")) == null);
+  if (source != null) {
+    return Tasks.Harvest(source, { stopWhenFull: false });
+  }
+  return null;
+};
 
-const body = (energy: number) => (
-  energy < 300
-    ? []
-    : ([WORK, WORK, MOVE, CARRY]
-        .concat(new Array(Math.floor((energy - 300) / 100)).fill(WORK)))
-);
+const body = (energy: number) => {
+  const maximumWorkParts
+    = SOURCE_ENERGY_CAPACITY / ENERGY_REGEN_TIME / HARVEST_POWER;
+  if (energy < BODYPART_COST.move + BODYPART_COST.work) {
+    return [];
+  }
+  return [MOVE].concat(new Array(Math.min(maximumWorkParts,
+    Math.floor((energy - BODYPART_COST.move) / BODYPART_COST.work)))
+    .fill(WORK));
+};
 
 export const Miner: WorkerDefinition = {
-  runAction: action,
+  assignTask,
   name: "miner",
   requiredCreeps: (room: Room) =>
-    room.find(FIND_STRUCTURES,
-      { filter: { structureType: STRUCTURE_CONTAINER } }).length > 0
-      ? 4
-      : 0,
+    room.sources.filter(s => s.container != null).length,
   bodyDefinition: body,
   motivationalThougts: [
     "RocknStone",

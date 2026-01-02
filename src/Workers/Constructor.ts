@@ -1,34 +1,61 @@
-import { runAction } from "../Actions/Action";
-import { buildConstructionSite } from "../Actions/buildConstructionSite";
-import { harvestFromClosestActiveSource } from "../Actions/harvest";
-import { repairStructure } from "../Actions/repairStructure";
-import { upgradeController } from "../Actions/upgradeController";
 import {
   closestContainerWithEnergy,
-  closestStorageWithResource,
-  notNull,
-} from "../Actions/Util";
-import { withdrawEnergy } from "../Actions/withdrawEnergy";
+} from "./Util";
+import Tasks from "../Tasks";
 import { WorkerDefinition } from "./worker";
 
-const action = (creep: Creep) => runAction(creep,
-  withdrawEnergy(closestStorageWithResource(creep.pos, RESOURCE_ENERGY)))
-  .or(withdrawEnergy(closestContainerWithEnergy(creep.pos)))
-  .or(harvestFromClosestActiveSource())
-  .andThen(buildConstructionSite())
-  .or(repairStructure())
-  .or(notNull(creep.room.controller, upgradeController))
-  .repeat();
+const assignTask = (creep: Creep) => {
+  if (creep.store.energy === 0) {
+    const storage = creep.room.storage;
+    if (storage != null && storage.store.energy > 0) {
+      return Tasks.Withdraw(storage);
+    }
+    const container = closestContainerWithEnergy(creep.pos);
+    if (container != null) {
+      return Tasks.Withdraw(container);
+    }
+    const source = creep.room.sources.find(s => s.energy > 0);
+    if (source != null) {
+      return Tasks.Harvest(source);
+    }
+  }
+  else {
+    const urgentRepair = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+      filter: s => s.hits < s.hitsMax * 0.3,
+    });
+    if (urgentRepair != null) {
+      return Tasks.Repair(urgentRepair);
+    }
+    const constructionSite
+      = creep.pos.findClosestByRange(FIND_MY_CONSTRUCTION_SITES);
+    if (constructionSite != null) {
+      return Tasks.Build(constructionSite);
+    }
+    const structure = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
+      filter: s => s.hits < s.hitsMax * 0.8,
+    }) ?? creep.pos.findClosestByRange(FIND_STRUCTURES, {
+      filter: s => s.hits < s.hitsMax * 0.8
+        && (s.structureType === STRUCTURE_WALL
+          || s.structureType === STRUCTURE_ROAD),
+    });
+    if (structure != null) {
+      return Tasks.Repair(structure);
+    }
+    else if (creep.room.controller != null) {
+      return Tasks.Upgrade(creep.room.controller);
+    }
+  }
+  return null;
+};
 
 const body = (energy: number) =>
   new Array(Math.floor(energy / 250))
     .fill([WORK, MOVE, CARRY, CARRY]).reduce((x, y) => x.concat(y), []);
 
 export const Constructor: WorkerDefinition = {
-  runAction: action,
+  assignTask,
   name: "constructor",
-  requiredCreeps: (room: Room) =>
-    room.find(FIND_CONSTRUCTION_SITES).length > 10 ? 2 : 1,
+  requiredCreeps: () => 1,
   bodyDefinition: body,
   motivationalThougts: [
     "I 💗 making",

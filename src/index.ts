@@ -1,14 +1,14 @@
-import { buildContainers } from "./RoomPlanner/Blueprints/Containers";
-import { buildExtentions } from "./RoomPlanner/Blueprints/Extensions";
-import { buildRoads } from "./RoomPlanner/Blueprints/Roads";
 import { Clerk } from "./Workers/Clerk";
 import { Constructor } from "./Workers/Constructor";
 import { Miner } from "./Workers/Miner";
 import { Upgrader } from "./Workers/Upgrader";
 import { runWorkers, spawnWorkers } from "./Workers/worker";
 import "../deps/Traveler/Traveler";
+import profiler from "screeps-profiler";
+import "./Proto";
+import RoomPlanner from "./RoomPlanner";
 
-const runTowers = (spawn: StructureSpawn) => {
+const runTowers = profiler.registerFN((spawn: StructureSpawn) => {
   const towers: StructureTower[] = spawn.room.find(FIND_MY_STRUCTURES,
     { filter: s => s.structureType === STRUCTURE_TOWER });
   for (const tower of towers) {
@@ -34,28 +34,32 @@ const runTowers = (spawn: StructureSpawn) => {
       console.log(tower.repair(str));
     }
   };
-};
+}, "runTowers");
 
-export function loop() {
+profiler.enable();
+export const loop = profiler.wrap(() => {
   const spawn = Game.spawns.Spawn1;
   const controller = spawn.room.controller;
   if (!controller) {
     return;
   }
-  const workerTypes = [Clerk, Upgrader, Miner, Constructor];
-  spawnWorkers(spawn, workerTypes);
-  runWorkers(spawn, workerTypes);
-  runTowers(spawn);
-  if (Game.time % 100 === 0) {
-    buildRoads(spawn.room);
+  if (spawn.room.name != "sim") {
+    const workerTypes = [Clerk, Upgrader, Miner, Constructor];
+    spawnWorkers(spawn, workerTypes);
+    runWorkers(workerTypes);
+    runTowers(spawn);
   }
-  if (Game.time % 100 === 50) {
-    buildExtentions(spawn.room);
+
+  for (const creep in Memory.creeps) {
+    if (!(creep in Game.creeps)) {
+      delete Memory.creeps[creep];
+    }
   }
-  if (Game.time % 100 === 25) {
-    buildContainers(spawn.room);
+  if (Game.time % 101 === 0) {
+    Game.profiler.email(100);
   }
   if (Game.cpu.bucket === 10000) {
     Game.cpu.generatePixel();
   }
-}
+  RoomPlanner(spawn.room);
+});
