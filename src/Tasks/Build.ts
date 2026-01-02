@@ -16,7 +16,7 @@ export const runBuild = profiler.registerFN((creep: Creep): TaskStatus => {
     return TaskStatus.DONE;
   }
 
-  if (creep.store.getUsedCapacity(RESOURCE_ENERGY) === 0) {
+  if (creep.store.energy === 0) {
     return TaskStatus.DONE;
   }
 
@@ -28,7 +28,6 @@ export const runBuild = profiler.registerFN((creep: Creep): TaskStatus => {
   if (target == null
     || creep.build(target) === ERR_NOT_IN_RANGE) {
     creep.travelTo(task.targetPos);
-    return TaskStatus.IN_PROGRESS;
   }
-  return TaskStatus.DONE;
+  return TaskStatus.IN_PROGRESS;
 }, "runBuild");

@@ -1,13 +1,3 @@
-import { Action, Fail } from "../Actions/Action";
-
-export const notNull
-  = <T>(x: T | null | undefined, f: (y: T) => Action): Action => {
-    if (x == null) {
-      return Fail;
-    }
-    return f(x);
-  };
-
 export const closestTowerToFill = (pos: RoomPosition): StructureTower | null =>
   pos.findClosestByRange(FIND_MY_STRUCTURES, {
     filter: structure => structure.structureType === STRUCTURE_TOWER

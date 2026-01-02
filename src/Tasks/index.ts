@@ -7,6 +7,7 @@ import { runTransfer, Transfer } from "./Transfer";
 import { Build, runBuild } from "./Build";
 import { Repair, runRepair } from "./Repair";
 import profiler from "screeps-profiler";
+import { Pickup, runPickup } from "./Pickup";
 export { TaskType, TaskStatus } from "./Task";
 
 declare global {
@@ -29,6 +30,8 @@ const runTask = profiler.registerFN((creep: Creep): TaskStatus => {
       return runBuild(creep);
     case TaskType.Repair:
       return runRepair(creep);
+    case TaskType.Pickup:
+      return runPickup(creep);
     default:
       return TaskStatus.DONE;
   }
@@ -45,12 +48,16 @@ Creep.prototype.run = function (generator?: (creep: Creep) => TaskData | null) {
   }
 };
 
-export default profiler.registerObject({
+const Tasks = {
   Harvest,
   Upgrade,
   Withdraw,
   Transfer,
   Build,
   Repair,
+  Pickup,
   ...TaskStatus,
-}, "Tasks");
+};
+profiler.registerObject(Tasks, "Tasks");
+
+export default Tasks;

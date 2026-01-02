@@ -30,6 +30,9 @@ export const runWithdraw = (creep: Creep): TaskStatus => {
   if (task == null) {
     return TaskStatus.DONE;
   }
+  if (task.target == null && task.targetPos.roomName == creep.room.name) {
+    return TaskStatus.DONE;
+  }
 
   const target = task.target as Structure | Tombstone | Ruin;
   const opts = task.options as WithdrawOptions;

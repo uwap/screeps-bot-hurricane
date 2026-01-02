@@ -1,5 +1,5 @@
 import {
-  packId, packPos, unpackId, unpackPos,
+  packPos, unpackPos,
 } from "../../deps/screeps-packrat/src/packrat";
 
 export enum TaskType {
@@ -9,6 +9,7 @@ export enum TaskType {
   Transfer,
   Build,
   Repair,
+  Pickup
 }
 
 export enum TaskStatus {
