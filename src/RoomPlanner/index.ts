@@ -190,10 +190,11 @@ export default profiler.registerFN(function (room: Room) {
   // Build Roads + Containers
   const roadTargets = (room.sources as (_HasRoomPosition | null)[])
     .concat([room.controller, room.mineral])
-    .concat([room.find(FIND_EXIT_TOP).at(0),
-      room.find(FIND_EXIT_LEFT).at(0),
-      room.find(FIND_EXIT_RIGHT).at(0),
-      room.find(FIND_EXIT_BOTTOM).at(0)]
+    .concat((room.find(FIND_EXIT_TOP).slice(0, 1))
+      .concat(room.find(FIND_EXIT_LEFT).slice(0, 1))
+      .concat(room.find(FIND_EXIT_RIGHT).slice(0, 1))
+      .concat(room.find(FIND_EXIT_BOTTOM).slice(0, 1))
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       .map(pos => pos != null ? ({ pos }) : null));
   for (const target of roadTargets) {
     if (target == null) {
