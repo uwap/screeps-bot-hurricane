@@ -46,13 +46,16 @@ export const runWithdraw = profiler.registerFN(
     const capacity = creep.store.getFreeCapacity(opts.resource);
     const amount = Math.min(opts.amount ?? capacity,
       opts.limit ?? capacity - creep.store.getUsedCapacity(opts.resource));
+    const amountS = target != null && "store" in target
+      ? target.store.getUsedCapacity(opts.resource)
+      : amount;
 
     if (amount <= 0) {
       return TaskStatus.DONE;
     }
 
     if (target == null
-      || creep.withdraw(target, opts.resource, amount) === ERR_NOT_IN_RANGE) {
+      || creep.withdraw(target, opts.resource, amountS) === ERR_NOT_IN_RANGE) {
       creep.travelTo(task.targetPos);
       return TaskStatus.IN_PROGRESS;
     }

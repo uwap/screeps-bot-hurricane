@@ -1,4 +1,4 @@
-import "../deps/Traveler/Traveler.js";
+import "../deps/Traveler/Traveler.ts";
 import "../deps/Traveler/index.d.ts";
 import "./Proto";
 import profiler from "screeps-profiler";
