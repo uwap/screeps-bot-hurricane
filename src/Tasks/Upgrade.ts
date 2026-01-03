@@ -11,7 +11,7 @@ export const Upgrade
   });
 
 export const runUpgrade = profiler.registerFN(
-  function runUpgrade(creep: Creep): TaskStatus {
+  function (creep: Creep): TaskStatus {
     const task = creep.task;
     if (task == null) {
       return TaskStatus.DONE;
@@ -28,4 +28,4 @@ export const runUpgrade = profiler.registerFN(
       creep.travelTo(task.targetPos);
     }
     return TaskStatus.IN_PROGRESS;
-  }) as (creep: Creep) => TaskStatus;
+  }, "Tasks.Upgrade.run") as (creep: Creep) => TaskStatus;

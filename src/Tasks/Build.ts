@@ -11,7 +11,7 @@ export const Build
   });
 
 export const runBuild = profiler.registerFN(
-  function runBuild(creep: Creep): TaskStatus {
+  function (creep: Creep): TaskStatus {
     const task = creep.task;
     if (task == null) {
       return TaskStatus.DONE;
@@ -31,4 +31,4 @@ export const runBuild = profiler.registerFN(
       creep.travelTo(task.targetPos);
     }
     return TaskStatus.IN_PROGRESS;
-  }) as (creep: Creep) => TaskStatus;
+  }, "Tasks.Build.run") as (creep: Creep) => TaskStatus;

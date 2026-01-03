@@ -27,7 +27,7 @@ export const Withdraw
   });
 
 export const runWithdraw = profiler.registerFN(
-  function runWithdraw(creep: Creep): TaskStatus {
+  function (creep: Creep): TaskStatus {
     const task = creep.task;
     if (task == null) {
       return TaskStatus.DONE;
@@ -57,4 +57,4 @@ export const runWithdraw = profiler.registerFN(
       return TaskStatus.IN_PROGRESS;
     }
     return TaskStatus.DONE;
-  }) as (creep: Creep) => TaskStatus;
+  }, "Tasks.Withdraw.run") as (creep: Creep) => TaskStatus;

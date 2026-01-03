@@ -24,7 +24,7 @@ export const Transfer
   });
 
 export const runTransfer = profiler.registerFN(
-  function runTransfer(creep: Creep): TaskStatus {
+  function (creep: Creep): TaskStatus {
     const task = creep.task;
     if (task == null) {
       return TaskStatus.DONE;
@@ -40,4 +40,4 @@ export const runTransfer = profiler.registerFN(
       return TaskStatus.IN_PROGRESS;
     }
     return TaskStatus.DONE;
-  }) as (creep: Creep) => TaskStatus;
+  }, "Tasks.Transfer.run") as (creep: Creep) => TaskStatus;

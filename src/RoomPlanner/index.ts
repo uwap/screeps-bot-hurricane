@@ -134,7 +134,7 @@ const createBuildSites = (room: Room) => {
   }
 };
 
-export default profiler.registerFN(function RoomPlanner(room: Room) {
+export default profiler.registerFN(function (room: Room) {
   if (!room.controller?.my) {
     return;
   }
@@ -468,4 +468,4 @@ export default profiler.registerFN(function RoomPlanner(room: Room) {
   }
 
   room.memory._planner = str;
-}) as (room: Room) => void;
+}, "RoomPlanner") as (room: Room) => void;

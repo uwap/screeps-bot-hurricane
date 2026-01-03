@@ -5,7 +5,7 @@
   "author": "uwap",
   "license": "MIT",
   "scripts": {
-    "build": "npx spack",
+    "build": "npx rspack build",
     "lint": "npx eslint src/",
     "test": "jest --passWithNoTests",
     "push": "yarn build && node ./upload.js"
@@ -16,6 +16,8 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
+    "@rspack/cli": "^1.7.0",
+    "@rspack/core": "^1.7.0",
     "@stylistic/eslint-plugin": "^5.6.1",
     "@swc/cli": "^0.7.9",
     "@swc/core": "^1.15.5",

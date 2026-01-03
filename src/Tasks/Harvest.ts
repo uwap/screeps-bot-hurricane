@@ -28,7 +28,7 @@ export const Harvest
   });
 
 export const runHarvest = profiler.registerFN(
-  function runHarvest(creep: Creep): TaskStatus {
+  function (creep: Creep): TaskStatus {
     const task = creep.task;
     if (task == null) {
       return TaskStatus.DONE;
@@ -47,4 +47,4 @@ export const runHarvest = profiler.registerFN(
       creep.travelTo(task.targetPos);
     }
     return TaskStatus.IN_PROGRESS;
-  }) as (creep: Creep) => TaskStatus;
+  }, "Tasks.Harvest.run") as (creep: Creep) => TaskStatus;
