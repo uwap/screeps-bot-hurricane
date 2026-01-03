@@ -10,7 +10,7 @@ export interface WorkerDefinition {
 }
 
 export const spawnWorkers = profiler.registerFN(
-  (spawn: StructureSpawn, workers: WorkerDefinition[]): void => {
+  function spawnWorkers(spawn: StructureSpawn, workers: WorkerDefinition[]) {
     for (const worker of workers) {
       for (let i = 0; i < worker.requiredCreeps(spawn.room); i++) {
         const ret = spawn.spawnCreep(
@@ -21,7 +21,7 @@ export const spawnWorkers = profiler.registerFN(
         }
       }
     }
-  }, "spawnWorkers");
+  }) as (spawn: StructureSpawn, workers: WorkerDefinition[]) => void;
 
 export const runWorkers = profiler.registerFN(
   function runWorkers(workers: WorkerDefinition[]) {
@@ -41,4 +41,4 @@ export const runWorkers = profiler.registerFN(
         }
       }
     }
-  });
+  }) as (workers: WorkerDefinition[]) => void;

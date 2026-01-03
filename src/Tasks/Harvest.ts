@@ -27,23 +27,24 @@ export const Harvest
     },
   });
 
-export const runHarvest = profiler.registerFN((creep: Creep): TaskStatus => {
-  const task = creep.task;
-  if (task == null) {
-    return TaskStatus.DONE;
-  }
+export const runHarvest = profiler.registerFN(
+  function runHarvest(creep: Creep): TaskStatus {
+    const task = creep.task;
+    if (task == null) {
+      return TaskStatus.DONE;
+    }
 
-  const target = task.target as Source | Mineral | null;
-  const opts = task.options as HarvestOptions;
-  const data = task.data as HarvestData;
+    const target = task.target as Source | Mineral | null;
+    const opts = task.options as HarvestOptions;
+    const data = task.data as HarvestData;
 
-  if (opts.stopWhenFull && creep.store.getFreeCapacity(data.resource) == 0) {
-    return TaskStatus.DONE;
-  }
+    if (opts.stopWhenFull && creep.store.getFreeCapacity(data.resource) == 0) {
+      return TaskStatus.DONE;
+    }
 
-  if (target == null
-    || creep.harvest(target) === ERR_NOT_IN_RANGE) {
-    creep.travelTo(task.targetPos);
-  }
-  return TaskStatus.IN_PROGRESS;
-}, "runHarvest");
+    if (target == null
+      || creep.harvest(target) === ERR_NOT_IN_RANGE) {
+      creep.travelTo(task.targetPos);
+    }
+    return TaskStatus.IN_PROGRESS;
+  }) as (creep: Creep) => TaskStatus;

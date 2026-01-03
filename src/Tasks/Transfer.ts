@@ -1,3 +1,4 @@
+import profiler from "screeps-profiler";
 import { TaskData, TaskStatus, TaskType } from "./Task";
 
 interface TransferOptions {
@@ -22,20 +23,21 @@ export const Transfer
     data: {},
   });
 
-export const runTransfer = (creep: Creep): TaskStatus => {
-  const task = creep.task;
-  if (task == null) {
+export const runTransfer = profiler.registerFN(
+  function runTransfer(creep: Creep): TaskStatus {
+    const task = creep.task;
+    if (task == null) {
+      return TaskStatus.DONE;
+    }
+
+    const target = task.target as Structure | Creep | PowerCreep | null;
+    const opts = task.options as TransferOptions;
+
+    if (target == null
+      || creep.transfer(
+        target, opts.resource, opts.amount ?? undefined) === ERR_NOT_IN_RANGE) {
+      creep.travelTo(task.targetPos);
+      return TaskStatus.IN_PROGRESS;
+    }
     return TaskStatus.DONE;
-  }
-
-  const target = task.target as Structure | Creep | PowerCreep;
-  const opts = task.options as TransferOptions;
-
-  if (target == null
-    || creep.transfer(
-      target, opts.resource, opts.amount ?? undefined) === ERR_NOT_IN_RANGE) {
-    creep.travelTo(task.targetPos);
-    return TaskStatus.IN_PROGRESS;
-  }
-  return TaskStatus.DONE;
-};
+  }) as (creep: Creep) => TaskStatus;

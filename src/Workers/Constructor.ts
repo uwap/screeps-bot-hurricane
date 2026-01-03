@@ -49,7 +49,7 @@ const assignTask = (creep: Creep) => {
 };
 
 const body = (energy: number) =>
-  new Array(Math.floor(energy / 250))
+  new Array<BodyPartConstant[]>(Math.floor(energy / 250))
     .fill([WORK, MOVE, CARRY, CARRY]).reduce((x, y) => x.concat(y), []);
 
 export const Constructor: WorkerDefinition = {

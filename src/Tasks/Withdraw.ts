@@ -1,3 +1,4 @@
+import profiler from "screeps-profiler";
 import { TaskData, TaskStatus, TaskType } from "./Task";
 
 interface WithdrawOptions {
@@ -25,34 +26,35 @@ export const Withdraw
     data: {},
   });
 
-export const runWithdraw = (creep: Creep): TaskStatus => {
-  const task = creep.task;
-  if (task == null) {
-    return TaskStatus.DONE;
-  }
-  if (task.target == null && task.targetPos.roomName == creep.room.name) {
-    return TaskStatus.DONE;
-  }
+export const runWithdraw = profiler.registerFN(
+  function runWithdraw(creep: Creep): TaskStatus {
+    const task = creep.task;
+    if (task == null) {
+      return TaskStatus.DONE;
+    }
+    if (task.target == null && task.targetPos.roomName == creep.room.name) {
+      return TaskStatus.DONE;
+    }
 
-  const target = task.target as Structure | Tombstone | Ruin;
-  const opts = task.options as WithdrawOptions;
+    const target = task.target as Structure | Tombstone | Ruin | null;
+    const opts = task.options as WithdrawOptions;
 
-  if (opts.limit != null
-    && creep.store.getUsedCapacity(opts.resource) >= opts.limit) {
+    if (opts.limit != null
+      && creep.store.getUsedCapacity(opts.resource) >= opts.limit) {
+      return TaskStatus.DONE;
+    }
+    const capacity = creep.store.getFreeCapacity(opts.resource);
+    const amount = Math.min(opts.amount ?? capacity,
+      opts.limit ?? capacity - creep.store.getUsedCapacity(opts.resource));
+
+    if (amount <= 0) {
+      return TaskStatus.DONE;
+    }
+
+    if (target == null
+      || creep.withdraw(target, opts.resource, amount) === ERR_NOT_IN_RANGE) {
+      creep.travelTo(task.targetPos);
+      return TaskStatus.IN_PROGRESS;
+    }
     return TaskStatus.DONE;
-  }
-  const capacity = creep.store.getFreeCapacity(opts.resource);
-  const amount = Math.min(opts.amount ?? capacity,
-    opts.limit ?? capacity - creep.store.getUsedCapacity(opts.resource));
-
-  if (amount <= 0) {
-    return TaskStatus.DONE;
-  }
-
-  if (target == null
-    || creep.withdraw(target, opts.resource, amount) === ERR_NOT_IN_RANGE) {
-    creep.travelTo(task.targetPos);
-    return TaskStatus.IN_PROGRESS;
-  }
-  return TaskStatus.DONE;
-};
+  }) as (creep: Creep) => TaskStatus;

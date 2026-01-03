@@ -10,24 +10,25 @@ export const Build
     data: {},
   });
 
-export const runBuild = profiler.registerFN((creep: Creep): TaskStatus => {
-  const task = creep.task;
-  if (task == null) {
-    return TaskStatus.DONE;
-  }
+export const runBuild = profiler.registerFN(
+  function runBuild(creep: Creep): TaskStatus {
+    const task = creep.task;
+    if (task == null) {
+      return TaskStatus.DONE;
+    }
 
-  if (creep.store.energy === 0) {
-    return TaskStatus.DONE;
-  }
+    if (creep.store.energy === 0) {
+      return TaskStatus.DONE;
+    }
 
-  const target = task.target as ConstructionSite;
-  if (target == null && task.targetPos.roomName === creep.room.name) {
-    return TaskStatus.DONE;
-  }
+    const target = task.target as ConstructionSite | null;
+    if (target == null && task.targetPos.roomName === creep.room.name) {
+      return TaskStatus.DONE;
+    }
 
-  if (target == null
-    || creep.build(target) === ERR_NOT_IN_RANGE) {
-    creep.travelTo(task.targetPos);
-  }
-  return TaskStatus.IN_PROGRESS;
-}, "runBuild");
+    if (target == null
+      || creep.build(target) === ERR_NOT_IN_RANGE) {
+      creep.travelTo(task.targetPos);
+    }
+    return TaskStatus.IN_PROGRESS;
+  }) as (creep: Creep) => TaskStatus;

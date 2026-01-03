@@ -12,8 +12,10 @@ const assignTask = (creep: Creep) => {
     if (ext != null) {
       return Tasks.Transfer(ext);
     }
-    if (creep.room.spawn?.store.getFreeCapacity(RESOURCE_ENERGY) ?? 0 > 0) {
-      return Tasks.Transfer(creep.room.spawn!);
+    if ((creep.room.spawn?.store.getFreeCapacity(RESOURCE_ENERGY) ?? 0) > 0) {
+      if (creep.room.spawn != null) {
+        return Tasks.Transfer(creep.room.spawn);
+      }
     }
     const tower = closestTowerToFill(creep.pos);
     if (tower != null) {
@@ -49,11 +51,12 @@ const assignTask = (creep: Creep) => {
   return null;
 };
 
-const body = (energy: number) => (
+const body = (energy: number): BodyPartConstant[] => (
   energy < 100
     ? []
-    : [WORK].concat(new Array(Math.floor((energy - 100) / 150))
-        .fill([MOVE, CARRY, CARRY]).reduce((x, y) => x.concat(y), []))
+    : ([WORK] as BodyPartConstant[]).concat(
+        new Array<BodyPartConstant[]>(Math.floor((energy - 100) / 150))
+          .fill([MOVE, CARRY, CARRY]).reduce((x, y) => x.concat(y), []))
 );
 
 export const Clerk: WorkerDefinition = {

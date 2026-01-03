@@ -6,7 +6,7 @@ const UNSET = 999;
 
 declare global {
   interface RoomMemory {
-    _planner: string;
+    _planner?: string;
   }
 }
 const structureCoding: (BuildableStructureConstant | null)[]
@@ -21,7 +21,7 @@ const getCoord = (x: number, y: number): number => {
 };
 
 const distanceTransform = (mask: (0 | 999 | 1000)[]): number[] => {
-  const arr: number[] = new Array(...mask);
+  const arr = new Array(...mask) as number[];
   for (let i = 0; arr.find(x => x === UNSET) != null; i++) {
     for (let x = 0; x < roomSize; x++) {
       for (let y = 0; y < roomSize; y++) {
@@ -61,7 +61,10 @@ const distanceTransform = (mask: (0 | 999 | 1000)[]): number[] => {
 } */
 
 const createBuildSites = (room: Room) => {
-  const structures = [];
+  if (room.memory._planner == null) {
+    return;
+  }
+  const structures = [] as (BuildableStructureConstant | null)[];
   for (let i = 0; i < room.memory._planner.length; i++) {
     structures.push(
       structureCoding[(room.memory._planner.charCodeAt(i) - 32) & 0b11111],
@@ -72,56 +75,57 @@ const createBuildSites = (room: Room) => {
   }
   for (let x = 0; x < roomSize; x++) {
     for (let y = 0; y < roomSize; y++) {
+      const struct = structures[getCoord(x, y)];
       if ((room.controller?.level ?? 0) < 2
-        && structures[getCoord(x, y)] != STRUCTURE_CONTAINER) {
+        && struct != STRUCTURE_CONTAINER) {
         continue;
       }
       if ((room.controller?.level ?? 0) < 3
-        && !(structures[getCoord(x, y)] == STRUCTURE_CONTAINER
-          || structures[getCoord(x, y)] == STRUCTURE_ROAD
-          || structures[getCoord(x, y)] == STRUCTURE_EXTENSION)) {
+        && !(struct == STRUCTURE_CONTAINER
+          || struct == STRUCTURE_ROAD
+          || struct == STRUCTURE_EXTENSION)) {
         continue;
       }
       if ((room.controller?.level ?? 0) < 4
-        && !(structures[getCoord(x, y)] == STRUCTURE_CONTAINER
-          || structures[getCoord(x, y)] == STRUCTURE_ROAD
-          || structures[getCoord(x, y)] == STRUCTURE_EXTENSION
-          || structures[getCoord(x, y)] == STRUCTURE_RAMPART
-          || structures[getCoord(x, y)] == STRUCTURE_TOWER)) {
+        && !(struct == STRUCTURE_CONTAINER
+          || struct == STRUCTURE_ROAD
+          || struct == STRUCTURE_EXTENSION
+          || struct == STRUCTURE_RAMPART
+          || struct == STRUCTURE_TOWER)) {
         continue;
       }
       if ((room.controller?.level ?? 0) < 5
-        && !(structures[getCoord(x, y)] == STRUCTURE_CONTAINER
-          || structures[getCoord(x, y)] == STRUCTURE_ROAD
-          || structures[getCoord(x, y)] == STRUCTURE_EXTENSION
-          || structures[getCoord(x, y)] == STRUCTURE_RAMPART
-          || structures[getCoord(x, y)] == STRUCTURE_TOWER
-          || structures[getCoord(x, y)] == STRUCTURE_WALL)) {
+        && !(struct == STRUCTURE_CONTAINER
+          || struct == STRUCTURE_ROAD
+          || struct == STRUCTURE_EXTENSION
+          || struct == STRUCTURE_RAMPART
+          || struct == STRUCTURE_TOWER
+          || struct == STRUCTURE_WALL)) {
         continue;
       }
       if ((room.controller?.level ?? 0) < 6
-        && !(structures[getCoord(x, y)] == STRUCTURE_CONTAINER
-          || structures[getCoord(x, y)] == STRUCTURE_ROAD
-          || structures[getCoord(x, y)] == STRUCTURE_EXTENSION
-          || structures[getCoord(x, y)] == STRUCTURE_RAMPART
-          || structures[getCoord(x, y)] == STRUCTURE_TOWER
-          || structures[getCoord(x, y)] == STRUCTURE_WALL
-          || structures[getCoord(x, y)] == STRUCTURE_STORAGE)) {
+        && !(struct == STRUCTURE_CONTAINER
+          || struct == STRUCTURE_ROAD
+          || struct == STRUCTURE_EXTENSION
+          || struct == STRUCTURE_RAMPART
+          || struct == STRUCTURE_TOWER
+          || struct == STRUCTURE_WALL
+          || struct == STRUCTURE_STORAGE)) {
         continue;
       }
       if ((room.controller?.level ?? 0) < 8
-        && !(structures[getCoord(x, y)] == STRUCTURE_CONTAINER
-          || structures[getCoord(x, y)] == STRUCTURE_ROAD
-          || structures[getCoord(x, y)] == STRUCTURE_EXTENSION
-          || structures[getCoord(x, y)] == STRUCTURE_RAMPART
-          || structures[getCoord(x, y)] == STRUCTURE_TOWER
-          || structures[getCoord(x, y)] == STRUCTURE_WALL
-          || structures[getCoord(x, y)] == STRUCTURE_STORAGE
-          || structures[getCoord(x, y)] == STRUCTURE_EXTRACTOR)) {
+        && !(struct == STRUCTURE_CONTAINER
+          || struct == STRUCTURE_ROAD
+          || struct == STRUCTURE_EXTENSION
+          || struct == STRUCTURE_RAMPART
+          || struct == STRUCTURE_TOWER
+          || struct == STRUCTURE_WALL
+          || struct == STRUCTURE_STORAGE
+          || struct == STRUCTURE_EXTRACTOR)) {
         continue;
       }
-      if (structures[getCoord(x, y)] != null) {
-        if (room.createConstructionSite(x, y, structures[getCoord(x, y)])
+      if (struct != null) {
+        if (room.createConstructionSite(x, y, struct)
           === ERR_FULL) {
           return;
         }
@@ -145,7 +149,7 @@ export default profiler.registerFN(function RoomPlanner(room: Room) {
     return;
   }
   const terrain = room.getTerrain();
-  const mask: number[] = new Array(roomSize * roomSize).fill(0);
+  const mask = new Array(roomSize * roomSize).fill(0) as number[];
   for (let x = 0; x < roomSize; x++) {
     for (let y = 0; y < roomSize; y++) {
       mask[getCoord(x, y)] = terrain.get(x, y);
@@ -154,7 +158,7 @@ export default profiler.registerFN(function RoomPlanner(room: Room) {
   const wallDistance = distanceTransform(
     mask.map(t => t === TERRAIN_MASK_WALL ? 0 : UNSET));
   const controllerCoord
-    = (room.controller?.pos.x ?? 0) + (room.controller?.pos.y ?? -1) * roomSize;
+    = room.controller.pos.x + room.controller.pos.y * roomSize;
   const controllerDistance = distanceTransform(
     mask.map((t, i) =>
       i === controllerCoord
@@ -168,7 +172,10 @@ export default profiler.registerFN(function RoomPlanner(room: Room) {
     (a, b) => b[0] - a[0])[0][1];
   const buildCenterX = buildCenter % roomSize;
   const buildCenterY = Math.floor(buildCenter / roomSize);
-  const buildCenterPos = room.getPositionAt(buildCenterX, buildCenterY)!;
+  const buildCenterPos = room.getPositionAt(buildCenterX, buildCenterY);
+  if (buildCenterPos == null) {
+    return;
+  }
   /* room.visual.rect(buildCenterX - 0.5, buildCenterY - 0.5, 1, 1, {
     stroke: "#FF0000",
   }); */
@@ -178,22 +185,22 @@ export default profiler.registerFN(function RoomPlanner(room: Room) {
   //
 
   const structures: (BuildableStructureConstant | null)[]
-    = new Array(roomSize * roomSize);
+    = new Array(roomSize * roomSize) as (BuildableStructureConstant | null)[];
 
   // Build Roads + Containers
   const roadTargets = (room.sources as (_HasRoomPosition | null)[])
     .concat([room.controller, room.mineral])
-    .concat([room.find(FIND_EXIT_TOP)?.[0],
-      room.find(FIND_EXIT_LEFT)?.[0],
-      room.find(FIND_EXIT_RIGHT)?.[0],
-      room.find(FIND_EXIT_BOTTOM)?.[0]]
-      .map(pos => pos == null ? null : ({ pos, highRange: true })));
+    .concat([room.find(FIND_EXIT_TOP).at(0),
+      room.find(FIND_EXIT_LEFT).at(0),
+      room.find(FIND_EXIT_RIGHT).at(0),
+      room.find(FIND_EXIT_BOTTOM).at(0)]
+      .map(pos => pos != null ? ({ pos }) : null));
   for (const target of roadTargets) {
     if (target == null) {
       continue;
     }
     const { path } = PathFinder.search(buildCenterPos,
-      { pos: target.pos, range: "highRange" in target ? 3 : 1 }, {
+      { pos: target.pos, range: 1 }, {
         swampCost: 10,
         plainCost: 2,
         roomCallback: function (roomName) {
@@ -358,82 +365,86 @@ export default profiler.registerFN(function RoomPlanner(room: Room) {
   largestY = Math.min(48, largestY + 3);
 
   const centerLine = Math.floor(largestY / 2 + smallestY / 2);
+  const wallStart = room.getPositionAt(smallestX - 1, centerLine + 1);
+  const wallEnd = room.getPositionAt(smallestX - 1, centerLine - 1);
+  if (wallStart != null && wallEnd != null) {
+    const { path } = PathFinder.search(wallStart, wallEnd,
+      {
+        plainCost: 100,
+        swampCost: 100,
 
-  const { path } = PathFinder.search(
-    room.getPositionAt(smallestX - 1, centerLine + 1)!,
-    room.getPositionAt(smallestX - 1, centerLine - 1)!,
-    {
-      plainCost: 100,
-      swampCost: 100,
+        roomCallback: function (roomName) {
+          if (roomName != room.name) {
+            return false;
+          }
 
-      roomCallback: function (roomName) {
-        if (roomName != room.name) {
-          return false;
-        }
-
-        const costs = new PathFinder.CostMatrix();
-        for (let x = 0; x < roomSize; x++) {
-          for (let y = 0; y < roomSize; y++) {
-            if (mask[getCoord(x, y)] === TERRAIN_MASK_WALL) {
-              costs.set(x, y, 1);
-            }
-            if (structures[getCoord(x, y)] != null) {
-              if (structures[getCoord(x, y)] == STRUCTURE_ROAD) {
-                costs.set(x, y, 254);
+          const costs = new PathFinder.CostMatrix();
+          for (let x = 0; x < roomSize; x++) {
+            for (let y = 0; y < roomSize; y++) {
+              if (mask[getCoord(x, y)] === TERRAIN_MASK_WALL) {
+                costs.set(x, y, 1);
               }
-              else {
-                costs.set(x, y, 255);
+              if (structures[getCoord(x, y)] != null) {
+                if (structures[getCoord(x, y)] == STRUCTURE_ROAD) {
+                  costs.set(x, y, 254);
+                }
+                else {
+                  costs.set(x, y, 255);
+                }
               }
             }
           }
-        }
-        for (let x = smallestX; x <= largestX; x++) {
-          for (let y = smallestY; y <= largestY; y++) {
-            costs.set(x, y, 255);
+          for (let x = smallestX; x <= largestX; x++) {
+            for (let y = smallestY; y <= largestY; y++) {
+              costs.set(x, y, 255);
+            }
           }
-        }
-        for (let x = 0; x < smallestX; x++) {
-          costs.set(x, centerLine, 255);
-        }
+          for (let x = 0; x < smallestX; x++) {
+            costs.set(x, centerLine, 255);
+          }
 
-        return costs;
-      },
-    });
+          return costs;
+        },
+      });
 
-  path.push(room.getPositionAt(smallestX - 1, centerLine)!);
-  for (const pos of path) {
-    const s = structures[getCoord(pos.x, pos.y)] === STRUCTURE_ROAD
-      || structures[getCoord(pos.x + 1, pos.y)] === STRUCTURE_ROAD
-      || structures[getCoord(pos.x - 1, pos.y)] === STRUCTURE_ROAD
-      || structures[getCoord(pos.x + 1, pos.y + 1)] === STRUCTURE_ROAD
-      || structures[getCoord(pos.x + 1, pos.y - 1)] === STRUCTURE_ROAD
-      || structures[getCoord(pos.x - 1, pos.y + 1)] === STRUCTURE_ROAD
-      || structures[getCoord(pos.x - 1, pos.y - 1)] === STRUCTURE_ROAD
-      || structures[getCoord(pos.x, pos.y + 1)] === STRUCTURE_ROAD
-      || structures[getCoord(pos.x, pos.y - 1)] === STRUCTURE_ROAD
-      ? STRUCTURE_RAMPART
-      : STRUCTURE_WALL;
-    if (mask[getCoord(pos.x, pos.y)] != TERRAIN_MASK_WALL) {
-      structures[getCoord(pos.x, pos.y)] = s;
+    const centerWallPiece = room.getPositionAt(smallestX - 1, centerLine);
+    if (centerWallPiece != null) {
+      path.push(centerWallPiece);
     }
-    else {
-      continue;
-    }
-    if (mask[getCoord(pos.x + 1, pos.y)] != TERRAIN_MASK_WALL
-      && structures[getCoord(pos.x + 1, pos.y)] != STRUCTURE_RAMPART) {
-      structures[getCoord(pos.x + 1, pos.y)] = s;
-    }
-    if (mask[getCoord(pos.x - 1, pos.y)] != TERRAIN_MASK_WALL
-      && structures[getCoord(pos.x - 1, pos.y)] != STRUCTURE_RAMPART) {
-      structures[getCoord(pos.x - 1, pos.y)] = s;
-    }
-    if (mask[getCoord(pos.x, pos.y + 1)] != TERRAIN_MASK_WALL
-      && structures[getCoord(pos.x, pos.y + 1)] != STRUCTURE_RAMPART) {
-      structures[getCoord(pos.x, pos.y + 1)] = s;
-    }
-    if (mask[getCoord(pos.x, pos.y - 1)] != TERRAIN_MASK_WALL
-      && structures[getCoord(pos.x, pos.y - 1)] != STRUCTURE_RAMPART) {
-      structures[getCoord(pos.x, pos.y - 1)] = s;
+    for (const pos of path) {
+      const s = structures[getCoord(pos.x, pos.y)] === STRUCTURE_ROAD
+        || structures[getCoord(pos.x + 1, pos.y)] === STRUCTURE_ROAD
+        || structures[getCoord(pos.x - 1, pos.y)] === STRUCTURE_ROAD
+        || structures[getCoord(pos.x + 1, pos.y + 1)] === STRUCTURE_ROAD
+        || structures[getCoord(pos.x + 1, pos.y - 1)] === STRUCTURE_ROAD
+        || structures[getCoord(pos.x - 1, pos.y + 1)] === STRUCTURE_ROAD
+        || structures[getCoord(pos.x - 1, pos.y - 1)] === STRUCTURE_ROAD
+        || structures[getCoord(pos.x, pos.y + 1)] === STRUCTURE_ROAD
+        || structures[getCoord(pos.x, pos.y - 1)] === STRUCTURE_ROAD
+        ? STRUCTURE_RAMPART
+        : STRUCTURE_WALL;
+      if (mask[getCoord(pos.x, pos.y)] != TERRAIN_MASK_WALL) {
+        structures[getCoord(pos.x, pos.y)] = s;
+      }
+      else {
+        continue;
+      }
+      if (mask[getCoord(pos.x + 1, pos.y)] != TERRAIN_MASK_WALL
+        && structures[getCoord(pos.x + 1, pos.y)] != STRUCTURE_RAMPART) {
+        structures[getCoord(pos.x + 1, pos.y)] = s;
+      }
+      if (mask[getCoord(pos.x - 1, pos.y)] != TERRAIN_MASK_WALL
+        && structures[getCoord(pos.x - 1, pos.y)] != STRUCTURE_RAMPART) {
+        structures[getCoord(pos.x - 1, pos.y)] = s;
+      }
+      if (mask[getCoord(pos.x, pos.y + 1)] != TERRAIN_MASK_WALL
+        && structures[getCoord(pos.x, pos.y + 1)] != STRUCTURE_RAMPART) {
+        structures[getCoord(pos.x, pos.y + 1)] = s;
+      }
+      if (mask[getCoord(pos.x, pos.y - 1)] != TERRAIN_MASK_WALL
+        && structures[getCoord(pos.x, pos.y - 1)] != STRUCTURE_RAMPART) {
+        structures[getCoord(pos.x, pos.y - 1)] = s;
+      }
     }
   }
 
@@ -457,4 +468,4 @@ export default profiler.registerFN(function RoomPlanner(room: Room) {
   }
 
   room.memory._planner = str;
-});
+}) as (room: Room) => void;

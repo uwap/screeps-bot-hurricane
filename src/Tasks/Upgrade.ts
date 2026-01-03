@@ -10,21 +10,22 @@ export const Upgrade
     data: {},
   });
 
-export const runUpgrade = profiler.registerFN((creep: Creep): TaskStatus => {
-  const task = creep.task;
-  if (task == null) {
-    return TaskStatus.DONE;
-  }
+export const runUpgrade = profiler.registerFN(
+  function runUpgrade(creep: Creep): TaskStatus {
+    const task = creep.task;
+    if (task == null) {
+      return TaskStatus.DONE;
+    }
 
-  if (creep.store.energy === 0) {
-    return TaskStatus.DONE;
-  }
+    if (creep.store.energy === 0) {
+      return TaskStatus.DONE;
+    }
 
-  const target = task.target as StructureController | null;
+    const target = task.target as StructureController | null;
 
-  if (target == null
-    || creep.upgradeController(target) === ERR_NOT_IN_RANGE) {
-    creep.travelTo(task.targetPos);
-  }
-  return TaskStatus.IN_PROGRESS;
-}, "runUpgrade");
+    if (target == null
+      || creep.upgradeController(target) === ERR_NOT_IN_RANGE) {
+      creep.travelTo(task.targetPos);
+    }
+    return TaskStatus.IN_PROGRESS;
+  }) as (creep: Creep) => TaskStatus;

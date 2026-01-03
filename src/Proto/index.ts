@@ -1,6 +1,6 @@
 declare global {
   interface RoomMemory {
-    sources: Record<Id<Source>, SourceMemory>;
+    sources?: Record<Id<Source>, SourceMemory>;
     spawn: Id<StructureSpawn> | null;
     mineral: Id<Mineral> | null;
     _spawnCacheTimeout?: number;
@@ -23,8 +23,8 @@ declare global {
 }
 
 Object.defineProperty(Room.prototype, "sources", {
-  get: function (this: Room) {
-    if (this == Room.prototype || this == undefined) return undefined;
+  get: function (this: Room | undefined): Source[] {
+    if (this == Room.prototype || this == undefined) return [];
     if (!this.memory.sources) {
       this.memory.sources = {};
       const sources = this.find(FIND_SOURCES);
@@ -34,14 +34,15 @@ Object.defineProperty(Room.prototype, "sources", {
         };
       }
     }
-    return Object.keys(this.memory.sources).map(Game.getObjectById);
+    return Object.keys(this.memory.sources)
+      .map(s => Game.getObjectById(s as Id<Source>)) as Source[];
   },
   enumerable: true,
   configurable: true,
 });
 
 Object.defineProperty(Room.prototype, "spawn", {
-  get: function (this: Room) {
+  get: function (this: Room | undefined) {
     if (this == Room.prototype || this == undefined) return undefined;
     if (!this.memory.spawn) {
       if (this.memory._spawnCacheTimeout == null
@@ -64,7 +65,7 @@ Object.defineProperty(Room.prototype, "spawn", {
 });
 
 Object.defineProperty(Room.prototype, "mineral", {
-  get: function (this: Room) {
+  get: function (this: Room | undefined) {
     if (this == Room.prototype || this == undefined) return undefined;
     if (!this.memory.mineral) {
       const minerals = this.find(FIND_MINERALS);
@@ -82,9 +83,27 @@ Object.defineProperty(Room.prototype, "mineral", {
 
 Object.defineProperty(Source.prototype, "memory", {
   get: function (this: Source) {
+    if (!this.room.memory.sources) {
+      this.room.memory.sources = {};
+      const sources = this.room.find(FIND_SOURCES);
+      for (const source of sources) {
+        this.room.memory.sources[source.id] = {
+          container: null,
+        };
+      }
+    }
     return this.room.memory.sources[this.id];
   },
   set: function (this: Source, mem: SourceMemory) {
+    if (!this.room.memory.sources) {
+      this.room.memory.sources = {};
+      const sources = this.room.find(FIND_SOURCES);
+      for (const source of sources) {
+        this.room.memory.sources[source.id] = {
+          container: null,
+        };
+      }
+    }
     this.room.memory.sources[this.id] = mem;
   },
   enumerable: false,
@@ -99,7 +118,7 @@ Object.defineProperty(Source.prototype, "container", {
         filter: (s: Structure) => s.structureType === STRUCTURE_CONTAINER,
       });
       if (containers.length > 0) {
-        this.memory.container = containers[0].id;
+        this.memory.container = containers[0].id as Id<StructureContainer>;
       }
     }
     return this.memory.container == null

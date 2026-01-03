@@ -23,7 +23,7 @@ const assignTask = (creep: Creep) => {
 };
 
 const body = (energy: number) =>
-  new Array(Math.floor(energy / 300))
+  new Array<BodyPartConstant[]>(Math.floor(energy / 300))
     .fill([WORK, WORK, MOVE, CARRY]).reduce((x, y) => x.concat(y), []);
 
 export const Upgrader: WorkerDefinition = {

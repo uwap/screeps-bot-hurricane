@@ -34,7 +34,7 @@ const runTowers = profiler.registerFN((spawn: StructureSpawn) => {
       console.log(tower.repair(str));
     }
   };
-}, "runTowers");
+}, "runTowers") as (spawn: StructureSpawn) => void;
 
 profiler.enable();
 export const loop = profiler.wrap(() => {
@@ -52,6 +52,7 @@ export const loop = profiler.wrap(() => {
 
   for (const creep in Memory.creeps) {
     if (!(creep in Game.creeps)) {
+      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
       delete Memory.creeps[creep];
     }
   }

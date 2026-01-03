@@ -45,8 +45,10 @@ const packTaskData = (td: TaskData): string =>
   + JSON.stringify({ o: td.options, d: td.data, t: td.target?.id });
 
 const unpackTaskData = (s: string): TaskData => {
-  const { o: options, d: data, t: targetId } = JSON.parse(s.substring(3));
-  const target = Game.getObjectById(targetId as Id<RoomObject & _HasId>);
+  const { o: options, d: data, t: targetId }
+    = JSON.parse(s.substring(3)) as {
+      o: object; d: object; t: Id<RoomObject & _HasId>; };
+  const target = Game.getObjectById(targetId);
   return {
     type: s.charCodeAt(0) - 65,
     targetPos: unpackPos(s.substring(1, 3)),

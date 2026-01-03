@@ -35,7 +35,7 @@ const runTask = profiler.registerFN((creep: Creep): TaskStatus => {
     default:
       return TaskStatus.DONE;
   }
-}, "runTask");
+}, "runTask") as (creep: Creep) => TaskStatus;
 
 Creep.prototype.run = function (generator?: (creep: Creep) => TaskData | null) {
   const status = runTask(this);

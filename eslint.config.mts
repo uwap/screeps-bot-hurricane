@@ -21,7 +21,7 @@ export default defineConfig([
       "@stylistic/max-len": ["error", { code: 80, tabWidth: 2 }],
     },
   },
-  tseslint.configs.recommended,
+  tseslint.configs.strictTypeChecked,
   tseslint.configs.stylisticTypeChecked,
   stylistic.configs.customize({
     quotes: "double",
