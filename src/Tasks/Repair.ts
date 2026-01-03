@@ -26,6 +26,10 @@ export const runRepair = profiler.registerFN(
       return TaskStatus.DONE;
     }
 
+    if (target != null && target.hits >= target.hitsMax) {
+      return TaskStatus.DONE;
+    }
+
     if (target == null
       || creep.repair(target) === ERR_NOT_IN_RANGE) {
       creep.travelTo(task.targetPos);

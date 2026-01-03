@@ -23,8 +23,10 @@ const assignTask = (creep: Creep) => {
     }
     if (creep.room.controller != null) {
       if (creep.room.controller.ticksToDowngrade > 1000) {
-        const urgentRepair = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
-          filter: s => s.hits < s.hitsMax * 0.3,
+        const urgentRepair = creep.pos.findClosestByRange(FIND_STRUCTURES, {
+          filter: s => s.hits < s.hitsMax * 0.3 && ("my" in s
+            ? s.my
+            : s.structureType === STRUCTURE_CONTAINER),
         });
         if (urgentRepair != null) {
           return Tasks.Repair(urgentRepair);

@@ -6,7 +6,7 @@
   "license": "MIT",
   "scripts": {
     "build": "npx rspack build",
-    "lint": "npx eslint src/",
+    "lint": "npx tsc --noEmit && npx eslint src/",
     "test": "jest --passWithNoTests",
     "push": "yarn build && node ./upload.js"
   },
@@ -23,6 +23,7 @@
     "@swc/core": "^1.15.5",
     "@swc/jest": "^0.2.39",
     "@types/jest": "^30.0.0",
+    "@types/lodash": "3.10.2",
     "@types/node": "^25.0.3",
     "@types/screeps-profiler": "^1.2.6",
     "@typescript-eslint/eslint-plugin": "^8.50.0",

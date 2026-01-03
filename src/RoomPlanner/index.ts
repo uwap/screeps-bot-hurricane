@@ -222,7 +222,7 @@ export default profiler.registerFN(function (room: Room) {
     for (let i = 0; i < path.length; i++) {
       const pos = path[i];
       structures[getCoord(pos.x, pos.y)]
-        = (i === path.length - 1 && "energy" in target)
+        = (i === path.length - 1 && "ticksToRegeneration" in target)
           ? STRUCTURE_CONTAINER
           : STRUCTURE_ROAD;
     }

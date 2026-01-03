@@ -21,10 +21,10 @@ const assignTask = (creep: Creep) => {
   }
   else {
     const urgentRepair = creep.pos.findClosestByRange(FIND_STRUCTURES, {
-      filter: s => "my" in s
+      filter: s => ("my" in s
         ? s.my
-        : s.structureType === STRUCTURE_CONTAINER
-          && s.hits < s.hitsMax * 0.3,
+        : s.structureType === STRUCTURE_CONTAINER)
+      && s.hits < s.hitsMax * 0.3,
     });
     if (urgentRepair != null) {
       return Tasks.Repair(urgentRepair);

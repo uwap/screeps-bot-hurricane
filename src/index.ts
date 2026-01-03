@@ -1,11 +1,13 @@
+import "../deps/Traveler/Traveler.js";
+import "../deps/Traveler/index.d.ts";
+import "./Proto";
+import profiler from "screeps-profiler";
+
 import { Clerk } from "./Workers/Clerk";
 import { Constructor } from "./Workers/Constructor";
 import { Miner } from "./Workers/Miner";
 import { Upgrader } from "./Workers/Upgrader";
 import { runWorkers, spawnWorkers } from "./Workers/worker";
-import "../deps/Traveler/Traveler";
-import profiler from "screeps-profiler";
-import "./Proto";
 import RoomPlanner from "./RoomPlanner";
 
 const runTowers = profiler.registerFN((spawn: StructureSpawn) => {
