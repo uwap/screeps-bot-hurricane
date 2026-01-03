@@ -20,8 +20,11 @@ const assignTask = (creep: Creep) => {
     }
   }
   else {
-    const urgentRepair = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
-      filter: s => s.hits < s.hitsMax * 0.3,
+    const urgentRepair = creep.pos.findClosestByRange(FIND_STRUCTURES, {
+      filter: s => "my" in s
+        ? s.my
+        : s.structureType === STRUCTURE_CONTAINER
+          && s.hits < s.hitsMax * 0.3,
     });
     if (urgentRepair != null) {
       return Tasks.Repair(urgentRepair);
@@ -35,8 +38,7 @@ const assignTask = (creep: Creep) => {
       filter: s => s.hits < s.hitsMax * 0.8,
     }) ?? creep.pos.findClosestByRange(FIND_STRUCTURES, {
       filter: s => s.hits < s.hitsMax * 0.8
-        && (s.structureType === STRUCTURE_WALL
-          || s.structureType === STRUCTURE_ROAD),
+        && ("my" in s ? s.my : true),
     });
     if (structure != null) {
       return Tasks.Repair(structure);

@@ -29,6 +29,7 @@ const assignTask = (creep: Creep) => {
         if (urgentRepair != null) {
           return Tasks.Repair(urgentRepair);
         }
+        return null;
       }
       return Tasks.Upgrade(creep.room.controller);
     }
