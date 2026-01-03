@@ -22,7 +22,7 @@
       "emitDecoratorMetadata": true
     },
     "include": [
-      "next-env.d.ts",
+      "deps/Traveler/index.d.ts",
       "**/*.ts",
       "**/*.tsx",
     ],
