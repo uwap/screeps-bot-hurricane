@@ -11,10 +11,13 @@ export interface WorkerDefinition {
 
 export const spawnWorkers = profiler.registerFN(
   function (spawn: StructureSpawn, workers: WorkerDefinition[]) {
+    const capacity = Object.values(Game.creeps).length > 2
+      ? spawn.room.energyCapacityAvailable
+      : spawn.store.getCapacity(RESOURCE_ENERGY);
     for (const worker of workers) {
       for (let i = 0; i < worker.requiredCreeps(spawn.room); i++) {
         const ret = spawn.spawnCreep(
-          worker.bodyDefinition(spawn.room.energyCapacityAvailable),
+          worker.bodyDefinition(capacity),
           worker.name + i.toString());
         if (ret === OK || ret === ERR_NOT_ENOUGH_ENERGY) {
           return;

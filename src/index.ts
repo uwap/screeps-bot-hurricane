@@ -46,7 +46,7 @@ export const loop = profiler.wrap(() => {
     return;
   }
   if (spawn.room.name != "sim") {
-    const workerTypes = [Clerk, Upgrader, Miner, Constructor];
+    const workerTypes = [Clerk, Miner, Upgrader, Constructor];
     spawnWorkers(spawn, workerTypes);
     runWorkers(workerTypes);
     runTowers(spawn);

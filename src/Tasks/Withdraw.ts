@@ -46,11 +46,11 @@ export const runWithdraw = profiler.registerFN(
     const capacity = creep.store.getFreeCapacity(opts.resource);
     const amount = Math.min(opts.amount ?? capacity,
       opts.limit ?? capacity - creep.store.getUsedCapacity(opts.resource));
-    const amountS = target != null && "store" in target
-      ? target.store.getUsedCapacity(opts.resource)
+    const amountS = (target != null && "store" in target)
+      ? Math.min(amount, target.store.getUsedCapacity(opts.resource))
       : amount;
 
-    if (amount <= 0) {
+    if (amountS <= 0) {
       return TaskStatus.DONE;
     }
 

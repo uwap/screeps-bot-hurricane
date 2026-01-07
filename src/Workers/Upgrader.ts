@@ -15,7 +15,8 @@ const assignTask = (creep: Creep) => {
   if (container != null) {
     return Tasks.Withdraw(container);
   }
-  const source = creep.pos.findClosestByPath(FIND_SOURCES_ACTIVE);
+  const source = creep.room.sources.find(s => s.energy > 0
+    && s.assignedCreeps.length == 0);
   if (source != null) {
     return Tasks.Harvest(source);
   }

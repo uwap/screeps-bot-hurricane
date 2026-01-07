@@ -21,8 +21,12 @@ const assignTask = (creep: Creep) => {
     if (tower != null) {
       return Tasks.Transfer(tower);
     }
+    if (creep.room.storage != null
+      && creep.room.storage.store.getFreeCapacity(RESOURCE_ENERGY) > 0) {
+      return Tasks.Transfer(creep.room.storage);
+    }
     if (creep.room.controller != null) {
-      if (creep.room.controller.ticksToDowngrade > 1000) {
+      if (creep.room.controller.ticksToDowngrade > 5000) {
         const urgentRepair = creep.pos.findClosestByRange(FIND_STRUCTURES, {
           filter: s => s.hits < s.hitsMax * 0.3 && ("my" in s
             ? s.my
@@ -30,6 +34,11 @@ const assignTask = (creep: Creep) => {
         });
         if (urgentRepair != null) {
           return Tasks.Repair(urgentRepair);
+        }
+        const buildSite
+          = creep.pos.findClosestByRange(FIND_MY_CONSTRUCTION_SITES);
+        if (buildSite != null) {
+          return Tasks.Build(buildSite);
         }
         return null;
       }
@@ -46,7 +55,8 @@ const assignTask = (creep: Creep) => {
     if (container != null) {
       return Tasks.Withdraw(container);
     }
-    const source = creep.pos.findClosestByPath(FIND_SOURCES_ACTIVE);
+    const source = creep.room.sources.find(s => s.energy > 0
+      && s.assignedCreeps.length == 0);
     if (source != null) {
       return Tasks.Harvest(source);
     }
@@ -65,7 +75,7 @@ const body = (energy: number): BodyPartConstant[] => (
 export const Clerk: WorkerDefinition = {
   assignTask,
   name: "clerk",
-  requiredCreeps: () => 3,
+  requiredCreeps: () => 1,
   bodyDefinition: body,
   motivationalThougts: [
     "Carrying 🎒",

@@ -14,7 +14,8 @@ const assignTask = (creep: Creep) => {
     if (container != null) {
       return Tasks.Withdraw(container);
     }
-    const source = creep.room.sources.find(s => s.energy > 0);
+    const source = creep.room.sources.find(s => s.energy > 0
+      && s.assignedCreeps.length == 0);
     if (source != null) {
       return Tasks.Harvest(source);
     }
@@ -34,9 +35,7 @@ const assignTask = (creep: Creep) => {
     if (constructionSite != null) {
       return Tasks.Build(constructionSite);
     }
-    const structure = creep.pos.findClosestByRange(FIND_MY_STRUCTURES, {
-      filter: s => s.hits < s.hitsMax * 0.8,
-    }) ?? creep.pos.findClosestByRange(FIND_STRUCTURES, {
+    const structure = creep.pos.findClosestByRange(FIND_STRUCTURES, {
       filter: s => s.hits < s.hitsMax * 0.8
         && ("my" in s ? s.my : true),
     });
